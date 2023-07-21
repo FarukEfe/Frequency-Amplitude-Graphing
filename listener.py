@@ -39,8 +39,6 @@ class AudioListener:
         plt.ion() # Interactive mode on
 
         fig, (ax1, ax2) = plt.subplots(2)
-        ax1.set_title("Frequency")
-        ax2.set_title("Amplitude")
         
         ############ Matplotlib Chart Setup ############
 
@@ -90,12 +88,20 @@ class AudioListener:
                 #print(f"\n\nFrequency: {np.sum(freq_list)/len(freq_list)}") # Get average frequency of self.data
                 #print(f"Amplitude: {np.sum(amp_list)/len(amp_list)}\n\n") # Get average amplitude of self.data
                 print(len(freq_list), len(amp_list), len(t_spectrum))
-                # Update Charts
+                ########## Update Charts ##########
+                # Clear previous data
+                ax1.cla()
+                ax2.cla()
+
+                # Plot new data
                 ax1.plot(t_spectrum, freq_list, color = 'b')
                 ax2.plot(t_spectrum, amp_list, color = 'r')
                 fig.canvas.draw()
+
+                # Flush events
                 fig.canvas.flush_events()
-                plt.pause(0.05)
+                plt.pause(0.0001)
+                ########## Update Charts Complete ##########
                 # Put in parameters and return destructive wave data
                 destructive_wave(self.data)
                 
