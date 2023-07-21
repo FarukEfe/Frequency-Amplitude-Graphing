@@ -1,13 +1,13 @@
 # Python Libraries
 import pyaudio as p
-import wave as w
+import numpy as np
 import os
 import matplotlib.pyplot as plt
 import keyboard as k
 import threading as t
 
 # Algorithm
-from descructiveWave import desctuctive_wave
+from algorithm import destructive_wave, get_frequency_amplitude
 from time import sleep
 
 # Ignore Warnings
@@ -15,9 +15,11 @@ import warnings
 import matplotlib
 warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
 
+# Constants
 CHUNK = 1024
-FORMAT = p.paInt16
 RATE = 44100
+FORMAT = p.paInt16
+
 
 class SoundData:
 
@@ -27,25 +29,21 @@ class SoundData:
 
 class AudioListener:
 
-    data = []
+    data = [] # A list containing the last 10 chunk readings at all times
     listener = p.PyAudio()
     canceling_sound: SoundData = None
 
     def listen(self):
-        # Open sample file
-        wf = w.open("sample.wav", "w")
-        wf.setnchannels(1)
-        wf.setsampwidth(p.get_sample_size(FORMAT))
-        wf.setframerate(RATE)
+        ############ Matplotlib Chart Setup ############
+        '''
+        plt.ion() # Interactive mode on
 
-        # Matplotlib Chart Setup
-        figure = plt.figure(figsize=(15,5))
-        ax = figure.add_subplot(111)
-        ax.set_title("Audio Spectrum ")
-        ax.set_xlabel("Time (s)")
-        ax.set_ylabel("Signal Wave")
-        line1, = ax.plot(0,0,"b-")
-        plt.rcParams['interactive'] == True
+        fig, (ax1, ax2) = plt.subplots(2)
+        plt.xlim(0,50)
+        ax1.set_title("top chart")
+        ax2.set_title("bottom chart")
+        '''
+        ############ Matplotlib Chart Setup ############
 
         # Start Stream
         stream = self.listener.open(
@@ -80,33 +78,33 @@ class AudioListener:
             self.data.append(iteration)
 
             # Remove first data if data length is 50
-            if len(self.data) >= 50:
+            if len(self.data) >= 10:
                 self.data.pop(0)
 
             # Create Destructive Wave if len(data) > 10
-            if len(self.data) > 10:
-                # Populate sample file
-                wf.writeframes(b''.join(self.data))
-                # Get frequency, amplitude, and other data needed
-                freq = wf.getframerate() # Frequency
-                n_samples = wf.getnframes() # Number of Samples
-                t_audio = n_samples / freq # Audio Time
-                # Update spectrum display
-                line1.set_ydata(freq)
-                wf.getnframes()
-                print(freq)
-                figure.canvas.draw()
-                figure.canvas.flush_events()
+            if len(self.data) > 3:
+                # Get frequency and amplitude
+                freq_list, amp_list = get_frequency_amplitude(self.data)
+                t_audio = (CHUNK * len(freq_list)) / RATE
+                t_spectrum = np.linspace(0, t_audio)
+                # Debug
+                print(f"\n\nFrequency: {np.sum(freq_list)/len(freq_list)}") # Get average frequency of self.data
+                print(f"Amplitude: {np.sum(amp_list)/len(amp_list)}\n\n") # Get average amplitude of self.data
+                # Update Charts
+                # ax1.plot(t_spectrum, freq_list, color = 'b')
+                # ax2.plot(t_spectrum, amp_list, color = 'r')
+                # plt.draw()
+                # plt.pause(0.05)
                 # Put in parameters and return destructive wave data
-                # find_destructive(self.data)
-                # Empty the .wav file
+                destructive_wave(self.data)
                 
             
             # Here thread noise_cancel
             # t.Thread(self.noise_cancel)
 
             # Sleep between iteration
-            sleep(0.2)
+            sleep(.1)
+
 
     def noise_cancel(self):
         # Play the canceling sound wave (thread function)
