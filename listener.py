@@ -35,14 +35,13 @@ class AudioListener:
 
     def listen(self):
         ############ Matplotlib Chart Setup ############
-        '''
+        
         plt.ion() # Interactive mode on
 
         fig, (ax1, ax2) = plt.subplots(2)
-        plt.xlim(0,50)
-        ax1.set_title("top chart")
-        ax2.set_title("bottom chart")
-        '''
+        ax1.set_title("Frequency")
+        ax2.set_title("Amplitude")
+        
         ############ Matplotlib Chart Setup ############
 
         # Start Stream
@@ -78,23 +77,25 @@ class AudioListener:
             self.data.append(iteration)
 
             # Remove first data if data length is 50
-            if len(self.data) >= 10:
+            if len(self.data) >= 50:
                 self.data.pop(0)
 
             # Create Destructive Wave if len(data) > 10
-            if len(self.data) > 3:
+            if len(self.data) > 10:
                 # Get frequency and amplitude
                 freq_list, amp_list = get_frequency_amplitude(self.data)
                 t_audio = (CHUNK * len(freq_list)) / RATE
-                t_spectrum = np.linspace(0, t_audio)
+                t_spectrum = np.linspace(0, t_audio, num=len(freq_list))
                 # Debug
-                print(f"\n\nFrequency: {np.sum(freq_list)/len(freq_list)}") # Get average frequency of self.data
-                print(f"Amplitude: {np.sum(amp_list)/len(amp_list)}\n\n") # Get average amplitude of self.data
+                #print(f"\n\nFrequency: {np.sum(freq_list)/len(freq_list)}") # Get average frequency of self.data
+                #print(f"Amplitude: {np.sum(amp_list)/len(amp_list)}\n\n") # Get average amplitude of self.data
+                print(len(freq_list), len(amp_list), len(t_spectrum))
                 # Update Charts
-                # ax1.plot(t_spectrum, freq_list, color = 'b')
-                # ax2.plot(t_spectrum, amp_list, color = 'r')
-                # plt.draw()
-                # plt.pause(0.05)
+                ax1.plot(t_spectrum, freq_list, color = 'b')
+                ax2.plot(t_spectrum, amp_list, color = 'r')
+                fig.canvas.draw()
+                fig.canvas.flush_events()
+                plt.pause(0.05)
                 # Put in parameters and return destructive wave data
                 destructive_wave(self.data)
                 
@@ -102,8 +103,8 @@ class AudioListener:
             # Here thread noise_cancel
             # t.Thread(self.noise_cancel)
 
-            # Sleep between iteration
-            sleep(.1)
+            # Sleep between iteration (Optional)
+            #sleep(.1)
 
 
     def noise_cancel(self):
