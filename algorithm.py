@@ -23,12 +23,11 @@ def get_frequency_amplitude(data):
         amplitude = np.max(np.abs(audio_array))
 
         # Convert to Decibels
-        amplitude_decibels = 20 * math.log10(amplitude/0.001)
+        amplitude_decibels = 20 * math.log10(amplitude)
 
-        # Add to array if above certain amplitude
-        if amplitude_decibels > 10:
-            freq_array.append(frequency)
-            amp_array.append(amplitude_decibels)
+        # Append
+        freq_array.append(frequency)
+        amp_array.append(amplitude_decibels) 
         
     # Return array if pitch loud enough
     if len(freq_array) != 0:
