@@ -57,7 +57,7 @@ class AudioListener:
                 stream.stop_stream()
                 stream.close()
                 self.listener.terminate()
-                
+
                 # Terminate Program
                 exit(0)
             '''
@@ -113,7 +113,6 @@ class AudioListener:
 
             # Sleep between iteration (For Debug Read)
             #sleep(1)
-
 
     def noise_cancel(self, stream):
         # Play the canceling sound wave (thread function)
