@@ -1,10 +1,7 @@
 import numpy as np
 import math
 
-CHUNK = 1024
-RATE = 44100
-
-def get_frequency_amplitude(data):
+def get_frequency_amplitude(data, min_freq=10, max_freq=1500):
     freq_array = []
     amp_array = []
     for d in data:
@@ -14,11 +11,13 @@ def get_frequency_amplitude(data):
         # Compute the Fast Fourier Transform (FFT) to find the frequency content
         freq_data = np.fft.fft(audio_array)
         magnitudes = np.abs(freq_data)
-        
-        # Find the dominant frequency bin (bin with highest magnitude)
-        dominant_bin = np.argmax(magnitudes)
-        frequency = dominant_bin * RATE / CHUNK
-        
+
+        # Noisegate to eliminate exteremes
+        magnitudes[np.logical_or(magnitudes < min_freq, magnitudes > max_freq)] = min_freq
+
+        # Get frequency
+        frequency = np.mean(magnitudes)
+
         # Calculate the amplitude (peak value) of the audio data
         amplitude = np.max(np.abs(audio_array))
 
@@ -35,7 +34,20 @@ def get_frequency_amplitude(data):
 
 
 
-def destructive_wave(data_points):
+def destructive_wave(frequency, amplitude, duration=np.inf, sample_rate=44100):
     # If under a certain decibel, return None
-    # Get frequency, amplitude, etc
-    pass
+    if amplitude < 40:
+        return None
+    
+    num_samples = int(duration * sample_rate)
+
+    # Generate a time array for the waveform
+    time_array = np.linspace(0, duration, num_samples, endpoint=False)
+
+    # Calculate the angular frequency (omega) based on the desired frequency
+    omega = 2 * np.pi * frequency
+
+    # Generate the sound wave using a sine function
+    waveform = amplitude * np.sin(omega * time_array)
+
+    return -waveform

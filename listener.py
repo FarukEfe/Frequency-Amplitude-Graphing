@@ -20,18 +20,11 @@ CHUNK = 1024
 RATE = 44100
 FORMAT = p.paInt16
 
-
-class SoundData:
-
-    # Add in necessary parameters
-    def __init__(self, pitch, amplitude):
-        pass
-
 class AudioListener:
 
     data = [] # A list containing the last 10 chunk readings at all times
     listener = p.PyAudio()
-    canceling_sound: SoundData = None
+    canceling_sound = None
 
     def listen(self):
         ############ Matplotlib Chart Setup ############
@@ -64,9 +57,7 @@ class AudioListener:
                 stream.stop_stream()
                 stream.close()
                 self.listener.terminate()
-                # Close and remove audio file
-                wf.close()
-                os.remove("sample.wav")
+                
                 # Terminate Program
                 exit(0)
             '''
@@ -85,17 +76,14 @@ class AudioListener:
                 freq_list, amp_list = get_frequency_amplitude(self.data)
                 t_audio = (CHUNK * len(freq_list)) / RATE
                 t_spectrum = np.linspace(-t_audio, 0, num=len(freq_list))
-                # Debug
-                #print(f"\n\nFrequency: {np.sum(freq_list)/len(freq_list)}") # Get average frequency of self.data
-                #print(f"Amplitude: {np.sum(amp_list)/len(amp_list)}\n\n") # Get average amplitude of self.data
-                print(len(freq_list), len(amp_list), len(t_spectrum))
+
                 ########## Update Charts ##########
                 # Clear previous data
                 ax1.cla()
                 ax2.cla()
 
                 # Reset ylim
-                ax1.set_ylim(ymin=0, ymax=15000)
+                ax1.set_ylim(ymin=0, ymax=1000)
                 ax2.set_ylim(ymin=25, ymax=125)
                 plt.xlim(-1,0)
 
@@ -115,21 +103,23 @@ class AudioListener:
                 ########## Update Charts Complete ##########
 
                 # Put in parameters and return destructive wave data
-                destructive_wave(self.data)
+                f_last_5 = np.sum(freq_list[-5:])/5 # Average frequency of last 5 data points
+                a_last_5 = np.sum(amp_list[-5:])/5 # Average amplitude of last 5 data points
+                self.canceling_sound = destructive_wave(f_last_5, a_last_5)
                 
             
             # Here thread noise_cancel
-            # t.Thread(self.noise_cancel)
+            t.Thread(target=self.noise_cancel, args=(stream))
 
-            # Sleep between iteration (Optional)
-            #sleep(.1)
+            # Sleep between iteration (For Debug Read)
+            #sleep(1)
 
 
-    def noise_cancel(self):
+    def noise_cancel(self, stream):
         # Play the canceling sound wave (thread function)
         while True:
             if self.canceling_sound != None:
-                pass
+                stream.write(self.canceling_sound.tobytes())
 
 
 
