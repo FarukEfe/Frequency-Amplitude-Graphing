@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import wave
 
 def get_frequency_amplitude(data, min_freq=10, max_freq=1500):
     freq_array = []
@@ -13,10 +14,16 @@ def get_frequency_amplitude(data, min_freq=10, max_freq=1500):
         magnitudes = np.abs(freq_data)
 
         # Noisegate to eliminate exteremes
-        magnitudes[np.logical_or(magnitudes < min_freq, magnitudes > max_freq)] = min_freq
+        magnitudes[np.logical_or(magnitudes < min_freq, magnitudes > max_freq)] = None
+
+        filtered = magnitudes[np.logical_not(np.isnan(magnitudes))]
 
         # Get frequency
-        frequency = np.mean(magnitudes)
+        frequency = 0
+        if len(filtered) == 0:
+            frequency = min_freq
+        else:
+            frequency = np.mean(filtered)
 
         # Calculate the amplitude (peak value) of the audio data
         amplitude = np.max(np.abs(audio_array))
@@ -34,7 +41,7 @@ def get_frequency_amplitude(data, min_freq=10, max_freq=1500):
 
 
 
-def destructive_wave(frequency, amplitude, duration=np.inf, sample_rate=44100):
+def destructive_wave(frequency, amplitude, duration=0.001, sample_rate=44100):
     # If under a certain decibel, return None
     if amplitude < 40:
         return None

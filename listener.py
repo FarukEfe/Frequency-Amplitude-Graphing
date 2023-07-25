@@ -26,6 +26,9 @@ class AudioListener:
     listener = p.PyAudio()
     canceling_sound = None
 
+    def sound_output():
+            pass
+    
     def listen(self):
         ############ Matplotlib Chart Setup ############
         
@@ -83,7 +86,7 @@ class AudioListener:
                 ax2.cla()
 
                 # Reset ylim
-                ax1.set_ylim(ymin=0, ymax=1000)
+                ax1.set_ylim(ymin=0, ymax=1500)
                 ax2.set_ylim(ymin=25, ymax=125)
                 plt.xlim(-1,0)
 
@@ -106,19 +109,10 @@ class AudioListener:
                 f_last_5 = np.sum(freq_list[-5:])/5 # Average frequency of last 5 data points
                 a_last_5 = np.sum(amp_list[-5:])/5 # Average amplitude of last 5 data points
                 self.canceling_sound = destructive_wave(f_last_5, a_last_5)
-                
-            
-            # Here thread noise_cancel
-            t.Thread(target=self.noise_cancel, args=(stream))
 
-            # Sleep between iteration (For Debug Read)
-            #sleep(1)
+            output_thread = t.Thread(target=self.sound_output)
 
-    def noise_cancel(self, stream):
-        # Play the canceling sound wave (thread function)
-        while True:
-            if self.canceling_sound != None:
-                stream.write(self.canceling_sound.tobytes())
+
 
 
 
