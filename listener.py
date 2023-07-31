@@ -26,8 +26,24 @@ class AudioListener:
     listener = p.PyAudio()
     canceling_sound = None
 
-    def sound_output():
-            pass
+    def sound_output(self):
+            
+            # Output Stream
+            output_stream = self.listener.open(
+            rate=RATE,
+            channels=1,
+            format=FORMAT,
+            output=True,
+            frames_per_buffer=CHUNK
+            )
+
+            while True:
+                # If canceling sound exists, play it
+                if self.canceling_sound:
+                    print("streaming...")
+                    output_stream.write(self.canceling_sound.tobytes())
+
+
     
     def listen(self):
         ############ Matplotlib Chart Setup ############
@@ -48,8 +64,13 @@ class AudioListener:
             frames_per_buffer=CHUNK
         )
 
+        # Initialize Output Thread
+        output_thread = t.Thread(target=self.sound_output)
+        output_thread.start()
+
         print("Start recording... (press 'e' to exit)")
 
+        # Lifecycle
         while True:
             # Re-set sample file data
             
@@ -109,8 +130,6 @@ class AudioListener:
                 f_last_5 = np.sum(freq_list[-5:])/5 # Average frequency of last 5 data points
                 a_last_5 = np.sum(amp_list[-5:])/5 # Average amplitude of last 5 data points
                 self.canceling_sound = destructive_wave(f_last_5, a_last_5)
-
-            output_thread = t.Thread(target=self.sound_output)
 
 
 
