@@ -41,10 +41,10 @@ def get_frequency_amplitude(data, min_freq=10, max_freq=1500):
 
 
 
-def destructive_wave(frequency, amplitude, duration=0.0001, sample_rate=44100):
+def destructive_wave(frequency, amplitude, duration=10, sample_rate=44100):
     # If under a certain decibel, return None
     if amplitude < 40:
-        return None
+        return []
     
     num_samples = int(duration * sample_rate)
 

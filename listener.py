@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import keyboard as k
 import threading as t
+from pygame import mixer, sndarray
 
 # Algorithm
 from algorithm import destructive_wave, get_frequency_amplitude
@@ -24,26 +25,20 @@ class AudioListener:
 
     data = [] # A list containing the last 10 chunk readings at all times
     listener = p.PyAudio()
-    canceling_sound = None
+    canceling_sound = []
 
     def sound_output(self):
-            
-            # Output Stream
-            output_stream = self.listener.open(
-            rate=RATE,
-            channels=1,
-            format=FORMAT,
-            output=True,
-            frames_per_buffer=CHUNK
-            )
-
-            while True:
-                # If canceling sound exists, play it
-                if self.canceling_sound:
-                    print("streaming...")
-                    output_stream.write(self.canceling_sound.tobytes())
-
-
+        if (self.canceling_sound) == 0:
+            return
+        mixer.init(frequency=RATE, channels=1)
+        sound = sndarray.make_sound(np.int16(self.canceling_sound * 32767))
+        channel = mixer.find_channel(True)
+        channel.play(sound, maxtime=1)
+        print(channel)
+        while True:
+            sound = sndarray.make_sound(np.int16(self.canceling_sound * 32767))
+            channel.queue(sound) # Doesn't recognize the method
+    
     
     def listen(self):
         ############ Matplotlib Chart Setup ############
