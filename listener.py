@@ -13,7 +13,7 @@ from time import sleep
 # Ignore Warnings
 import warnings
 import matplotlib
-warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
+#warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
 
 # Constants
 CHUNK = 1024
