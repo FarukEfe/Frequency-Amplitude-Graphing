@@ -8,7 +8,7 @@ import threading as t
 from pygame import mixer, sndarray
 
 # Algorithm
-from algorithm import destructive_wave, get_frequency_amplitude
+from algorithm import get_frequency_amplitude
 from time import sleep
 
 # Ignore Warnings
@@ -59,28 +59,10 @@ class AudioListener:
             frames_per_buffer=CHUNK
         )
 
-        # Initialize Output Thread
-        output_thread = t.Thread(target=self.sound_output)
-        output_thread.start()
-
-        print("Start recording... (press 'e' to exit)")
+        print("Start recording...")
 
         # Lifecycle
         while True:
-            # Re-set sample file data
-            
-            # Terminate if user presses enter
-            '''
-            if k.is_pressed("e"):
-                # Stop stream and terminate channel
-                stream.stop_stream()
-                stream.close()
-                self.listener.terminate()
-
-                # Terminate Program
-                exit(0)
-            '''
-
             # Read chunk
             iteration = stream.read(CHUNK, exception_on_overflow=False)
             self.data.append(iteration)
@@ -89,7 +71,7 @@ class AudioListener:
             if len(self.data) >= 50:
                 self.data.pop(0)
 
-            # Create Destructive Wave if len(data) > 10
+            # Chart data if length exceeds 10 items
             if len(self.data) > 10:
                 # Get frequency and amplitude
                 freq_list, amp_list = get_frequency_amplitude(self.data)
@@ -120,14 +102,6 @@ class AudioListener:
                 # Flush events
                 fig.canvas.flush_events()
                 ########## Update Charts Complete ##########
-
-                # Put in parameters and return destructive wave data
-                f_last_5 = np.sum(freq_list[-5:])/5 # Average frequency of last 5 data points
-                a_last_5 = np.sum(amp_list[-5:])/5 # Average amplitude of last 5 data points
-                self.canceling_sound = destructive_wave(f_last_5, a_last_5)
-
-
-
 
 
 if __name__ == "__main__":
