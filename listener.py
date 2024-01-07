@@ -3,7 +3,6 @@ import pyaudio as p
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-import keyboard as k
 import threading as t
 from pygame import mixer, sndarray
 
@@ -25,20 +24,6 @@ class AudioListener:
 
     data = [] # A list containing the last 10 chunk readings at all times
     listener = p.PyAudio()
-    canceling_sound = []
-
-    def sound_output(self):
-        if (self.canceling_sound) == 0:
-            return
-        mixer.init(frequency=RATE, channels=1)
-        sound = sndarray.make_sound(np.int16(self.canceling_sound * 32767))
-        channel = mixer.find_channel(True)
-        channel.play(sound, maxtime=1)
-        print(channel)
-        while True:
-            sound = sndarray.make_sound(np.int16(self.canceling_sound * 32767))
-            channel.queue(sound) # Doesn't recognize the method
-    
     
     def listen(self):
         ############ Matplotlib Chart Setup ############
