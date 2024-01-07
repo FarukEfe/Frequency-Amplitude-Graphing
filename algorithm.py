@@ -40,7 +40,7 @@ def get_frequency_amplitude(data, min_freq=10, max_freq=1500):
         return (freq_array, amp_array)
 
 
-
+# Experimental, not yet used
 def destructive_wave(frequency, amplitude, duration=10, sample_rate=44100):
     # If under a certain decibel, return None
     if amplitude < 40:
