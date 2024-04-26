@@ -4,7 +4,7 @@ The amplitude and frequency computation can all be found in `algorithm.py` file
 ### Project Setup
 Download the project file into your preferred local directory and execute the following commands:
 ```bash
-./Scripts/activate
+./modules/Scripts/activate
 ```
 Since the project is set on a virtual environment, this command activates all of the modules installed in the virtual environment
 If the project still doesn't run due to missing modules (which is unlikely), you can try manually installing the modules used in the project using pip commands.
